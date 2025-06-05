@@ -34,8 +34,6 @@ export const startServer = () => {
   });
 
   app.get('/students/:studentId', async (req, res, next) => {
-    next();
-
     const { studentId } = req.params;
     const student = await Student.findById(studentId);
 
