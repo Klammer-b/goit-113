@@ -13,6 +13,13 @@ export const startServer = () => {
 
   app.use(cors(), pino(), requestIdMiddleware);
 
+  app.use(
+    express.json({
+      type: ['application/json', 'application/vnd.api+json'],
+      limit: '100kb',
+    }),
+  );
+
   app.use(router);
 
   app.use(errorHandlerMiddleware);

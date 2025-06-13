@@ -1,7 +1,9 @@
 import {
+  createStudent,
   deleteStudentById,
   getStudentById,
   getStudents,
+  updateStudent,
 } from '../services/students.js';
 
 export const getStudentsController = async (req, res) => {
@@ -21,6 +23,44 @@ export const getStudentByIdController = async (req, res) => {
   res.json({
     message: `Successfully retrieved student with id ${studentId}!`,
     status: 200,
+    data: student,
+  });
+};
+
+export const createStudentController = async (req, res) => {
+  const student = await createStudent(req.body);
+
+  return res.status(201).json({
+    message: `Successfully created student!`,
+    status: 201,
+    data: student,
+  });
+};
+
+export const patchStudentController = async (req, res) => {
+  const { studentId } = req.params;
+  const { student } = await updateStudent(studentId, req.body, {
+    upsert: false,
+  });
+
+  return res.json({
+    message: `Successfully updated student with id ${studentId}!`,
+    status: 200,
+    data: student,
+  });
+};
+
+export const upsertStudentController = async (req, res) => {
+  const { studentId } = req.params;
+  const { student, isNew } = await updateStudent(studentId, req.body, {
+    upsert: true,
+  });
+
+  const status = isNew ? 201 : 200;
+
+  return res.status(status).json({
+    message: `Successfully updated student with id ${studentId}!`,
+    status,
     data: student,
   });
 };
