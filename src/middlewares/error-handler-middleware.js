@@ -2,6 +2,18 @@ import { isHttpError } from 'http-errors';
 import { MongooseError } from 'mongoose';
 
 export const errorHandlerMiddleware = (error, req, res, next) => {
+  if (error.isJoi) {
+    return res.status(400).json({
+      status: 400,
+      errorMessage: 'Validation error',
+      id: req.id,
+      details: error.details.map(({ path, message }) => ({
+        path,
+        message,
+      })),
+    });
+  }
+
   if (isHttpError(error)) {
     return res.status(error.status).json({
       status: error.status,

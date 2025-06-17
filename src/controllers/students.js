@@ -29,6 +29,10 @@ export const getStudentByIdController = async (req, res) => {
 };
 
 export const createStudentController = async (req, res) => {
+  // todo move to helper or service layer
+  if (req.body.firstName && req.body.lastName) {
+    req.body.name = req.body.firstName + ' ' + req.body.lastName;
+  }
   const student = await createStudent(req.body);
 
   return res.status(201).json({
@@ -39,6 +43,9 @@ export const createStudentController = async (req, res) => {
 };
 
 export const patchStudentController = async (req, res) => {
+  if (req.body.firstName && req.body.lastName) {
+    req.body.name = req.body.firstName + ' ' + req.body.lastName;
+  }
   const { studentId } = req.params;
   const student = await updateStudent(studentId, req.body);
 
@@ -50,6 +57,9 @@ export const patchStudentController = async (req, res) => {
 };
 
 export const upsertStudentController = async (req, res) => {
+  if (req.body.firstName && req.body.lastName) {
+    req.body.name = req.body.firstName + ' ' + req.body.lastName;
+  }
   const { studentId } = req.params;
   const { student, isNew } = await upsertStudent(studentId, req.body);
 
