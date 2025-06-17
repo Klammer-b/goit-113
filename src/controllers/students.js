@@ -4,6 +4,7 @@ import {
   getStudentById,
   getStudents,
   updateStudent,
+  upsertStudent,
 } from '../services/students.js';
 
 export const getStudentsController = async (req, res) => {
@@ -39,9 +40,7 @@ export const createStudentController = async (req, res) => {
 
 export const patchStudentController = async (req, res) => {
   const { studentId } = req.params;
-  const { student } = await updateStudent(studentId, req.body, {
-    upsert: false,
-  });
+  const student = await updateStudent(studentId, req.body);
 
   return res.json({
     message: `Successfully updated student with id ${studentId}!`,
@@ -52,9 +51,7 @@ export const patchStudentController = async (req, res) => {
 
 export const upsertStudentController = async (req, res) => {
   const { studentId } = req.params;
-  const { student, isNew } = await updateStudent(studentId, req.body, {
-    upsert: true,
-  });
+  const { student, isNew } = await upsertStudent(studentId, req.body);
 
   const status = isNew ? 201 : 200;
 

@@ -23,22 +23,27 @@ export const createStudent = async (payload) => {
   return student;
 };
 
-export const updateStudent = async (studentId, payload, options) => {
-  const result = await Student.findOneAndUpdate({ _id: studentId }, payload, {
-    ...options,
+export const updateStudent = async (studentId, payload) => {
+  const student = await Student.findOneAndUpdate({ _id: studentId }, payload, {
     new: true,
-    includeResultMetadata: true,
-    runValidators: true,
   });
 
-  if (!result.value) {
+  if (!student) {
     throw createHttpError(404, 'Student not found!');
   }
 
-  return {
-    student: result.value,
-    isNew: !result.lastErrorObject.updatedExisting,
-  };
+  return student;
+};
+
+export const upsertStudent = async (studentId, payload) => {
+  const student = await Student.findById(studentId);
+
+  if (student) {
+    student.set(payload);
+    return { isNew: false, student: await student.save() };
+  } else {
+    return { isNew: true, student: await Student.create(payload) };
+  }
 };
 
 export const deleteStudentById = async (studentId) => {
