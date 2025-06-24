@@ -7,11 +7,12 @@ import router from './routes/index.js';
 import { notFoundMiddleware } from './middlewares/not-found-middleware.js';
 import { requestIdMiddleware } from './middlewares/request-id-middleware.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler-middleware.js';
+import cookieParser from 'cookie-parser';
 
 export const startServer = () => {
   const app = express();
 
-  app.use(cors(), pino(), requestIdMiddleware);
+  app.use(cors(), pino(), cookieParser(), requestIdMiddleware);
 
   app.use(
     express.json({
