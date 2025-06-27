@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {
   loginUserController,
+  logoutUserController,
+  refreshSessionController,
   registerUserController,
 } from '../controllers/auth.js';
 import { validateBody } from '../middlewares/validate-body-middleware.js';
@@ -19,7 +21,7 @@ authRouter.post(
   validateBody(loginUserValidationSchema),
   loginUserController,
 );
-// authRouter.post('/auth/logout');
-// authRouter.post('/auth/refresh-session');
+authRouter.post('/auth/logout', logoutUserController);
+authRouter.post('/auth/refresh-session', refreshSessionController);
 
 export default authRouter;
