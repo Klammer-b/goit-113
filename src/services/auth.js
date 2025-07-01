@@ -1,8 +1,20 @@
 import createHttpError from 'http-errors';
+import Handlebars from 'handlebars';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
 import { User } from '../db/models/user.js';
 import { Session } from '../db/models/session.js';
+import { sendEmail } from '../utils/send-email.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
+import { ENV_VARS } from '../constants/envVars.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { TEMPLATE_DIR } from '../constants/paths.js';
+
+const resetPasswordTemplate = fs
+  .readFileSync(path.join(TEMPLATE_DIR, 'reset-password-email-template.html'))
+  .toString();
 
 const createSession = () => ({
   accessToken: crypto.randomBytes(30).toString('base64'),
@@ -85,4 +97,55 @@ export const refreshSession = async (sessionId, sessionToken) => {
   });
 
   return newSession;
+};
+
+export const requestResetPasswordEmail = async (email) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw createHttpError(401, "Can't reset password for this user");
+  }
+
+  const token = jwt.sign(
+    {
+      sub: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    getEnvVar(ENV_VARS.JWT_SECRET),
+    {
+      expiresIn: '2m',
+    },
+  );
+
+  const template = Handlebars.compile(resetPasswordTemplate);
+
+  const html = template({
+    name: user.name,
+    link: `${getEnvVar(ENV_VARS.FRONTEND_DOMAIN)}/reset-password?token=${token}`,
+  });
+
+  await sendEmail({ email, html, subject: 'Reset your password!' });
+};
+
+export const resetPassword = async ({ token, password }) => {
+  let tokenPayload;
+
+  try {
+    tokenPayload = jwt.verify(token, getEnvVar(ENV_VARS.JWT_SECRET));
+  } catch (err) {
+    console.log(err);
+    throw createHttpError(401, 'JWT token expired or corrupted!');
+  }
+
+  const user = await User.findById(tokenPayload.sub);
+
+  if (!user) {
+    throw createHttpError(404, 'User not found!');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await User.findByIdAndUpdate(tokenPayload.sub, { password: hashedPassword });
+  await Session.findOneAndDelete({ userId: tokenPayload.sub });
 };
