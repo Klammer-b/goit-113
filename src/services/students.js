@@ -36,6 +36,10 @@ export const getStudents = async ({
     studentFiltersConditions.where('onDuty').equals(filters.onDuty);
   }
 
+  if (filters.parentId) {
+    studentFiltersConditions.where('parentId').equals(filters.parentId);
+  }
+
   const [students, studentsCount] = await Promise.all([
     Student.find()
       .merge(studentFiltersConditions)

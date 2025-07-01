@@ -1,3 +1,4 @@
+import { ROLES } from '../constants/roles.js';
 import {
   createStudent,
   deleteStudentById,
@@ -16,6 +17,10 @@ export const getStudentsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
   const filters = parseFilters(req.query);
+  if (req.user.role === ROLES.PARENT) {
+    filters.parentId = req.user._id;
+  }
+
   const students = await getStudents({
     page,
     perPage,
@@ -47,7 +52,10 @@ export const createStudentController = async (req, res) => {
   if (req.body.firstName && req.body.lastName) {
     req.body.name = req.body.firstName + ' ' + req.body.lastName;
   }
-  const student = await createStudent(req.body);
+  const student = await createStudent({
+    ...req.body,
+    parentId: req.body.parentId ?? req.user._id,
+  });
 
   return res.status(201).json({
     message: `Successfully created student!`,

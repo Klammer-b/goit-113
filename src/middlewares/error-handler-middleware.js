@@ -25,7 +25,7 @@ export const errorHandlerMiddleware = (error, req, res, next) => {
   if (error instanceof MongooseError) {
     return res.status(500).json({
       status: 500,
-      errorMessage: 'MongoDB error!',
+      errorMessage: 'Mongoose error!',
       id: req.id,
       details: error.message,
     });

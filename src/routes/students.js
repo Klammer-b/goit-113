@@ -11,10 +11,17 @@ import { validateMongoDBId } from '../middlewares/validate-mongo-id.js';
 import { validateBody } from '../middlewares/validate-body-middleware.js';
 import { createStudentValidationSchema } from '../validation/create-student-validation-schema.js';
 import { updateStudentValidationSchema } from '../validation/update-student-validation-schema.js';
+import { authenticate } from '../middlewares/authenticate-middleware.js';
+import { checkRolesForStudent } from '../middlewares/check-roles-middleware.js';
 
 const studentsRouter = Router();
+studentsRouter.use('/students', authenticate);
 
-studentsRouter.use('/students/:studentId', validateMongoDBId('studentId'));
+studentsRouter.use(
+  '/students/:studentId',
+  validateMongoDBId('studentId'),
+  checkRolesForStudent,
+);
 
 studentsRouter.get('/students', getStudentsController);
 studentsRouter.get('/students/:studentId', getStudentByIdController);

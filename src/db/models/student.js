@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { GENDERS } from '../../constants/genders.js';
+import { User } from './user.js';
 
 const studentSchema = new Schema(
   {
@@ -24,6 +25,11 @@ const studentSchema = new Schema(
       type: Boolean,
       required: true,
       default: false,
+    },
+    parentId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: User,
     },
   },
   {
