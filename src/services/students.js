@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { Student } from '../db/models/student.js';
 import { createPaginationMetadata } from '../utils/create-pagination-metadata.js';
+import { saveFile } from '../utils/save-file.js';
 
 export const getStudents = async ({
   page,
@@ -97,4 +98,18 @@ export const upsertStudent = async (studentId, payload) => {
 
 export const deleteStudentById = async (studentId) => {
   await Student.findByIdAndDelete(studentId);
+};
+
+export const uploadStudentsAvatar = async (studentId, file) => {
+  const url = await saveFile(file);
+
+  const student = await Student.findByIdAndUpdate(
+    studentId,
+    {
+      avatarUrl: url,
+    },
+    { new: true },
+  );
+
+  return student;
 };

@@ -8,6 +8,7 @@ import { notFoundMiddleware } from './middlewares/not-found-middleware.js';
 import { requestIdMiddleware } from './middlewares/request-id-middleware.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler-middleware.js';
 import cookieParser from 'cookie-parser';
+import { PERMANENT_UPLOAD_DIR } from './constants/paths.js';
 
 export const startServer = () => {
   const app = express();
@@ -20,6 +21,8 @@ export const startServer = () => {
       limit: '100kb',
     }),
   );
+
+  app.use('/uploads', express.static(PERMANENT_UPLOAD_DIR));
 
   app.use(router);
 
