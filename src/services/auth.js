@@ -2,7 +2,7 @@ import createHttpError from 'http-errors';
 import Handlebars from 'handlebars';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import crypto from 'node:crypto';
+import crypto, { randomBytes } from 'node:crypto';
 import { User } from '../db/models/user.js';
 import { Session } from '../db/models/session.js';
 import { sendEmail } from '../utils/send-email.js';
@@ -11,6 +11,10 @@ import { ENV_VARS } from '../constants/envVars.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { TEMPLATE_DIR } from '../constants/paths.js';
+import {
+  getAuthInfo,
+  getGoogleOAuthUrl,
+} from '../utils/google-oauth-client.js';
 
 const resetPasswordTemplate = fs
   .readFileSync(path.join(TEMPLATE_DIR, 'reset-password-email-template.html'))
@@ -148,4 +152,30 @@ export const resetPassword = async ({ token, password }) => {
 
   await User.findByIdAndUpdate(tokenPayload.sub, { password: hashedPassword });
   await Session.findOneAndDelete({ userId: tokenPayload.sub });
+};
+
+export const getGoogleAuthUrl = () => getGoogleOAuthUrl();
+
+export const authorizeWithGoogleOauth = async (code) => {
+  const payload = await getAuthInfo(code);
+  const { email } = payload;
+
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    user = await User.create({
+      name: payload.name,
+      email: payload.email,
+      password: await bcrypt.hash(randomBytes(20), 10),
+      avatarUrl: payload.picture,
+    });
+  }
+  await Session.findOneAndDelete({ userId: user._id });
+
+  const session = await Session.create({
+    ...createSession(),
+    userId: user._id,
+  });
+
+  return session;
 };

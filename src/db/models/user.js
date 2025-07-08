@@ -22,6 +22,11 @@ const userSchema = new Schema(
       default: ROLES.PARENT,
       enum: Object.values(ROLES),
     },
+    avatarUrl: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   {
     timestamps: true,
