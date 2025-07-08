@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import {
+  authorizeWithGoogleController,
+  getGoogleOauthUrlController,
   loginUserController,
   logoutUserController,
   refreshSessionController,
@@ -12,6 +14,7 @@ import { registerUserValidationSchema } from '../validation/register-user-valida
 import { loginUserValidationSchema } from '../validation/login-user-validation-schema.js';
 import { requestResetPasswordEmailValidationSchema } from '../validation/request-reset-password-email-validation-schema.js';
 import { resetPasswordValidationSchema } from '../validation/reset-password-validation-schema.js';
+import { authorizeWithGoogleOAuthValidationSchema } from '../validation/authorize-with-google-ouath.js';
 
 const authRouter = Router();
 
@@ -37,6 +40,13 @@ authRouter.post(
   '/auth/reset-password',
   validateBody(resetPasswordValidationSchema),
   resetPasswordController,
+);
+
+authRouter.post('/auth/get-google-oauth-link', getGoogleOauthUrlController);
+authRouter.post(
+  '/auth/authorize-with-google-oauth',
+  validateBody(authorizeWithGoogleOAuthValidationSchema),
+  authorizeWithGoogleController,
 );
 
 export default authRouter;

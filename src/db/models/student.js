@@ -34,6 +34,7 @@ const studentSchema = new Schema(
     avatarUrl: {
       type: String,
       required: false,
+      default: null,
     },
   },
   {
