@@ -5,6 +5,7 @@ import {
   getStudentById,
   getStudents,
   updateStudent,
+  uploadStudentsAvatar,
   upsertStudent,
 } from '../services/students.js';
 import {
@@ -73,6 +74,17 @@ export const patchStudentController = async (req, res) => {
 
   return res.json({
     message: `Successfully updated student with id ${studentId}!`,
+    status: 200,
+    data: student,
+  });
+};
+
+export const uploadStudentsAvatarController = async (req, res) => {
+  const { studentId } = req.params;
+  const student = await uploadStudentsAvatar(studentId, req.file);
+
+  return res.json({
+    message: `Successfully updated students avatar with id ${studentId}!`,
     status: 200,
     data: student,
   });
