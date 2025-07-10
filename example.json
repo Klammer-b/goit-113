@@ -1,0 +1,17 @@
+{
+  "name": "Borys",
+  "address": {
+    "country": "Ukraine",
+    "city": "Kyiv"
+  },
+  "cats": [
+    {
+      "name": "Uzbek",
+      "age": 5
+    },
+    {
+      "name": "Lukas",
+      "age": 5
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import { requestIdMiddleware } from './middlewares/request-id-middleware.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler-middleware.js';
 import cookieParser from 'cookie-parser';
 import { PERMANENT_UPLOAD_DIR } from './constants/paths.js';
+import { setupSwagger } from './middlewares/swagger.js';
 
 export const startServer = () => {
   const app = express();
@@ -21,6 +22,8 @@ export const startServer = () => {
       limit: '100kb',
     }),
   );
+
+  app.use('/api-docs', setupSwagger());
 
   app.use('/uploads', express.static(PERMANENT_UPLOAD_DIR));
 
